@@ -1,4 +1,9 @@
 DIR=$(egrep ^Include /etc/zabbix/zabbix_agentd.conf | cut -d= -f2 | sed -r 's/\*.+//')
+if [[ "${DIR}" == "" ]]; then
+    echo "FATAL: No Inslude option in config file"
+    exit 1
+fi
+
 cat << EOF > "${DIR}/iostat.conf"
 Timeout=30
 UserParameter=iostat.discovery, python /etc/zabbix/scripts/iostat/iostat-discovery.py
