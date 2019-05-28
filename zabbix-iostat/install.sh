@@ -1,8 +1,8 @@
-DIR=$(egrep ^Include /etc/zabbix/zabbix_agentd.conf | cut -d= -f2 | cut -d / -f -4)
+DIR=$(egrep ^Include /etc/zabbix/zabbix_agentd.conf | cut -d= -f2 | sed -r 's/\*.+//')
 cat << EOF > "${DIR}/iostat.conf"
 Timeout=30
 UserParameter=iostat.discovery, python /etc/zabbix/scripts/iostat/iostat-discovery.py
-UserParameter=iostat.collect, python /etc/zabbix/scripts/iostat/iostat-collect.py /tmp/iostat.json 8 || echo 1
+UserParameter=iostat.collect, python /etc/zabbix/scripts/iostat/iostat-collect.py /tmp/iostat.json 20 || echo 1
 UserParameter=iostat.metric[*], python /etc/zabbix/scripts/iostat/iostat-parse.py /tmp/iostat.json \$1 \$2
 EOF
 
@@ -39,6 +39,7 @@ for line in lines:
         if flag > 1:
             lines2 = line.split('\n')
             keys = lines2[0].split()
+            keys[0] = "Device"
             for line2 in lines2[1:]:
                 values = line2.split()
                 data.append(dict(zip(keys, values)))
