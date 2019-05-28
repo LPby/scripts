@@ -1,7 +1,26 @@
+#!/bin/bash 
+
+error () {
+    echo "FATAL: ${1}" 1>&2
+    exit 1
+}
+
+
+if [ "$(id -u)" != "0" ]; then
+   error "This script must be run as root"
+fi
+
 DIR=$(egrep ^Include /etc/zabbix/zabbix_agentd.conf | cut -d= -f2 | sed -r 's/\*.+//')
 if [[ "${DIR}" == "" ]]; then
-    echo "FATAL: No Inslude option in config file"
-    exit 1
+    error "No Inslude option in config file"
+fi
+
+if which apt &>/dev/null; then
+    apt update
+    apt -y install sysstat
+fi
+if which yum &>/dev/null; then
+    yum -y install sysstat
 fi
 
 cat << EOF > "${DIR}/iostat.conf"
