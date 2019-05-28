@@ -1,3 +1,5 @@
+#!/bin/bash
+
 DIR=$(egrep ^Include /etc/zabbix/zabbix_agentd.conf | cut -d= -f2 | sed -r 's/\*.+//')
 if [[ "${DIR}" == "" ]]; then
     echo "FATAL: No Inslude option in config file"
